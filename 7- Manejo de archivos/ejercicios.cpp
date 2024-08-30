@@ -17,6 +17,22 @@ void leerFloats(FILE *stream) {
     cout << "\n" << endl;
 }
 
+void populateFiles(FILE *f1, FILE *f2) {
+    int num1=1, num2=2, num3=3, num4=4;
+
+    f1 = fopen("bin/archivo1", "wb");
+    f2 = fopen("bin/archivo2", "wb");
+
+    fwrite(&num1, sizeof(int), 1, f1);
+    fwrite(&num3, sizeof(int), 1, f1);
+
+    fwrite(&num2, sizeof(int), 1, f2);
+    fwrite(&num4, sizeof(int), 1, f2);
+
+    fclose(f1);
+    fclose(f2);
+}
+
 void ejercicio1() {
     cout << "********************* Ejercicio 1 *********************\n" << endl;
 
@@ -93,9 +109,49 @@ void ejercicio2() {
     }
 }
 
+void ejercicio3() {
+    cout << "********************* Ejercicio 3 *********************\n" << endl;
+
+    FILE *f1, *f2, *f3;
+    int elem, num1, num2;
+
+    populateFiles(f1, f2);
+
+    if (
+        (f1 = fopen("bin/archivo1", "rb")) != NULL &&
+        (f2 = fopen("bin/archivo2", "rb")) != NULL &&
+        (f3 = fopen("bin/archivo3", "wb+")) != NULL
+    ) {
+        while (
+            fread(&num1, sizeof(int), 1, f1) &&
+            fread(&num2, sizeof(int), 1, f2)
+        ) {
+            cout << "contenido archivo 1: " << num1 << endl;
+            cout << "contenido archivo 2: " << num2 << endl;
+
+            fwrite(&num1, sizeof(int), 1, f3);
+            fwrite(&num2, sizeof(int), 1, f3);
+        }
+
+        fclose(f1);
+        fclose(f2);
+
+        cout << "\nContenido de archivo3: ";
+
+        fseek(f3, 0, SEEK_SET);
+
+        while(fread(&elem, sizeof(int), 1, f3)) {
+            cout << elem << ", ";
+        }
+    } else {
+        cout << "No se pudo abrir ninguno de los archivos";
+    }
+}
+
 int main() {
-    ejercicio1();
-    ejercicio2();
+    //ejercicio1();
+    //ejercicio2();
+    ejercicio3();
 
     return 0;
 }

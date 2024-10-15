@@ -46,9 +46,6 @@ void ejercicio2() {
 }
 
 int main() {
-    //ejercicio1();
-    //ejercicio2();
-
 
     return 0;
 }

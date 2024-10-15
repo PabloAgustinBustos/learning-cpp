@@ -4,47 +4,53 @@ using namespace std;
 
 struct Node {
     int value = NULL;
-    Node* next = NULL;
+    Node *next = NULL;
 };
 
-void logNode(Node* node) {
+void logNode(Node *node) {
     if (!node) {
-        cout << NULL << endl;
+        cout << "NULL" << endl;
         return;
     }
 
     cout << node << " {" << endl;
-    cout << "  value: " << node->value << endl;
-    cout << "  next: " << node->next << endl;
+    cout << " value: " << node->value << endl;
+    cout << " next: " << node->next << endl;
     cout << "}" << endl;
 }
-void printListValues(Node* node) {
-    while (node != NULL) {
-        //logNode(node);
-        cout << node->value;
-
-        if (node->next == NULL) cout << "\n";
-        else cout << ", ";
-
-        node = node->next;
+void printList(Node *head) {
+    if (!head) {
+        cout << "NULL" << endl;
+        return;
     }
-}
-void printList(Node* node) {
-    while (node != NULL) {
-        logNode(node);
 
-        node = node->next;
+    Node *current = head;
+
+    do {
+        logNode(current);
+
+        current = current->next;
+    } while (current);
+}
+void printListValues(Node *head) {
+    if (!head) {
+        cout << "Lista vacia" << endl;
+        return;
     }
+
+    Node *current = head;
+
+    do {
+        cout << current->value;
+
+        if (current->next) cout << ", ";
+        else cout << "\n";
+
+        current = current->next;
+    } while (current);
 }
 
-void addFirst(Node* &head, int newNumber) {
-    Node* aux = head;   // Mantengo guardado el head en otro puntero para no perderlo
-
-    head = new Node();
-    head->value = newNumber;
-    head->next = aux;
-}
-void addLast(Node* &head, int newNumber) {
+void addLast(Node *&head, int newNumber) {
     if (!head) {
         head = new Node();
         head->value = newNumber;
@@ -52,81 +58,136 @@ void addLast(Node* &head, int newNumber) {
         return;
     }
 
-    Node* last = head;  // Uso un nodo auxiliar que representará el último nodo en la lista
+    Node *last = head;
 
-    while (last->next != NULL) {    // Recorro hasta llegar al último nodo
+    while (last->next) {
         last = last->next;
     }
 
-    // Añado el nuevo nodo
     last->next = new Node();
-    last = last->next;          // Ahora hay un nuevo último nodo, lo obtengo.
+    last = last->next;
     last->value = newNumber;
 }
+void addFirst(Node *&head, int newNumber) {
+    Node *aux = head;
 
-Node* getNode(Node* head, int number) {
-    Node* node = head;
+    head = new Node();
+    head->value = newNumber;
+    head->next = aux;
+}
+void addAfter(Node *head, int nodeNumber, int newNumber) {
+    if (!head) return;
 
-    while (node != NULL && node->value != number) {
-        node = node->next;
+    Node *current = head;
+
+    while (current->next && current->value != nodeNumber) {
+        current = current->next;
     }
 
-    return node;
+    if (!current) return;
+
+    Node *newNode = new Node();
+    Node *aux = current->next;
+
+    newNode->value = newNumber;
+    newNode->next = aux;
+
+    current->next = newNode;
+}
+void addAfterNode(Node *node, int newNumber) {
+    if (!node) return;
+
+    Node *newNode = new Node();
+    Node *aux = node->next;
+
+    newNode->value = newNumber;
+    newNode->next = aux;
+
+    node->next = newNode;
 }
 
-void deleteFirst(Node* &head) {
-    if (head) {
-        Node *aux = head;
+void deleteFirst(Node *&head) {
+    if(!head) return;
 
-        head = head->next;
+    Node *aux = head;
+    head = head->next;
 
-        delete aux;
-    }
-
+    delete aux;
+    aux = NULL;
 }
-void deleteLast(Node* &head) {
-    if (!head) return;  // Caso de lista vacía
+void deleteLast(Node *&head) {
+    if (!head) return;
 
-    Node* last = head;
-    Node* beforeLast;   // Necesito trackear también el nodo anterior al último
+    Node *last = head;
+    Node *beforeLast;
 
-    // Mientras que haya un siguiente nodo
     while (last->next) {
         beforeLast = last;
         last = last->next;
     }
 
     if (last == head) {
-        // Caso de único elemento en la lista
-
-        delete head;    // Liberamos la memoría
-        head = NULL;    // Dejamos de apuntar a un espacio vacío
+        delete head;
+        head = NULL;
     } else {
-        // Caso donde haya más elementos
+        beforeLast->next = NULL;
 
-        beforeLast->next = NULL;    // Desconectamos los nodos
-        delete last;    // Eliminamos el que antes era el último
+        delete last;
         last = NULL;
     }
 }
+void deleteNode(Node *&head, int number) {
+    if (!head) return;
+
+    Node *current = head;
+    Node *beforeCurrent = NULL;
+
+    while (current->next && current->value != number) {
+        beforeCurrent = current;
+        current = current->next;
+    }
+
+    if (current->value != number) return;
+
+    if (current == head) {
+        head = head->next;
+    } else {
+        beforeCurrent->next = current->next;
+    }
+
+    delete current;
+    current = NULL;
+}
+
+Node* getNode(Node* head, int number) {
+    Node* current = head;
+
+    while (current && current->value != number) {
+        current = current->next;
+    }
+
+    return current;
+}
 
 int main() {
-    Node* head  = NULL;
+    Node *numbers = NULL;
 
-    addLast(head, 1);
-    addLast(head, 2);
-    addLast(head, 3);
+    addLast(numbers, 2);
+    addLast(numbers, 4);
+    addLast(numbers, 6);
 
-    addFirst(head, 0);
-    addFirst(head, -1);
+    cout << "Lista por nodos: " << endl;
+    printListValues(numbers);
+    cout << "-------------------------------------------\n";
 
-    cout << "Lista: " << endl;
-    printListValues(head);
+    Node *node = getNode(numbers, 2);
 
-    deleteLast(head);
+    addAfterNode(node, 3);
 
-    cout << "\nLista: " << endl;
-    printListValues(head);
+    cout << "Lista por nodos: " << endl;
+    printListValues(numbers);
+    cout << "-------------------------------------------\n";
 
     return 0;
 }
+

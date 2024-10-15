@@ -46,15 +46,20 @@ void populateFiles(FILE *f1, FILE *f2) {
 }
 
 void populateFiles2(FILE *f1, FILE *f2) {
-    int numbers1[] = {1,4,5,20,31};
-    int numbers2[] = {3,6,8,9,12};
+    //int numbers1[] = {1,4,5,20,31};
+    //int numbers2[] = {3,6,8,9,12};
+    int numbers1[] = {1,2,3,4};
+    int numbers2[] = {5,6,7};
+
+    //int numbers1[] = {1,2,3,5,9,10};
+    //int numbers2[] = {4,6,7,8};
 
     f1 = fopen("bin/archivo1", "wb");
     f2 = fopen("bin/archivo2", "wb");
 
 
     fwrite(numbers1, sizeof(int), 5, f1);
-    fwrite(numbers2, sizeof(int), 5, f2);
+    fwrite(numbers2, sizeof(int), 6, f2);
 
 
     fclose(f1);
@@ -189,8 +194,10 @@ void ejercicio3() {
 }
 
 void ejercicio4() {
+    cout << "********************* Ejercicio 4 *********************\n" << endl;
+
     FILE *f1, *f2, *f3;
-    int elem1, elem2;
+    int elem1, elem2/*, lastRead = 0*/;
 
     populateFiles2(f1,f2);
 
@@ -200,27 +207,38 @@ void ejercicio4() {
 
     if (f1 && f2 && f3) {
         while(fread(&elem1, sizeof(int), 1, f1) && fread(&elem2, sizeof(int), 1, f2)) {
-            cout << elem1 << " < " << elem2 << " -> " << (elem1 < elem2) << endl;
+            //cout << elem1 << " < " << elem2 << " -> " << (elem1 < elem2) << endl;
 
             if (elem1 < elem2) {
                 fwrite(&elem1, sizeof(int), 1, f3);
                 fseek(f2, -sizeof(int), SEEK_CUR);  //Lo pongo una posición atrás
+                //lastRead = 1;
+                cout << "se escribió " << elem1 << endl;
             } else {
                 fwrite(&elem2, sizeof(int), 1, f3);
                 fseek(f1, -sizeof(int), SEEK_CUR);  //Lo pongo una posición atrás
+                //lastRead = 2;
+                cout << "se escribió " << elem2 << endl;
             }
         }
 
-        cout << "Listo" << endl;
+        cout << "Listo elem1=" << elem1 << " y elem2=" << elem2 << endl;
+        cout << "feof de f1=" << feof(f1) << " y feof de f2=" << feof(f2) << endl;
+        cout << "cursor de f1 = " << ftell(f1) << ". Cursor de f2 = " << ftell(f2) << endl;
 
-        while(!feof(f1)) {
+        //if (lastRead == 1) fseek(f2, -sizeof(int), SEEK_CUR);
+        //else if (lastRead == 2) fseek(f1, -sizeof(int), SEEK_CUR);
+
+        while(!feof(f1) && fread(&elem1, sizeof(int), 1, f1)) {
             fwrite(&elem1, sizeof(int), 1, f3);
-            fread(&elem1, sizeof(int), 1, f1);
+            cout << "1) Se escribio " << elem1 << endl;
         }
 
-        while(!feof(f2)) {
+        while(!feof(f2) && fread(&elem2, sizeof(int), 1, f2)) {
+            cout << "2) Se leyo " << elem2 << ". Cursor en " << ftell(f2) << endl;
             fwrite(&elem2, sizeof(int), 1, f3);
-            fread(&elem2, sizeof(int), 1, f2);
+            cout << "2) Se escribio " << elem2 << endl;
+            cout << "2) Cursor en " << ftell(f2) << endl;
         }
 
         fclose(f1);
@@ -286,8 +304,8 @@ int main() {
     //ejercicio1();
     //ejercicio2();
     //ejercicio3();
-    //ejercicio4();
-    ejercicio5();
+    ejercicio4();
+
 
     return 0;
 }

@@ -3,8 +3,10 @@
 using namespace std;
 
 struct Node {
-    int value = 0;
+    int value = NULL;
+
     Node *next = NULL;
+    Node *prev = NULL;
 };
 
 void logNode(Node *node) {
@@ -16,6 +18,7 @@ void logNode(Node *node) {
     cout << node << " {" << endl;
     cout << " value: " << node->value << endl;
     cout << " next: " << node->next << endl;
+    cout << " prev: " << node->prev << endl;
     cout << "}" << endl;
 }
 void printList(Node *head) {
@@ -64,35 +67,20 @@ void addLast(Node *&head, int newNumber) {
         last = last->next;
     }
 
-    last->next = new Node();
-    last = last->next;
-    last->value = newNumber;
+    Node *newNode = new Node();
+    newNode->value = newNumber;
+
+    last->next = newNode;
+    newNode->prev = last;
 }
 void addFirst(Node *&head, int newNumber) {
     Node *aux = head;
 
     head = new Node();
     head->value = newNumber;
+
     head->next = aux;
-}
-void addAfter(Node *head, int nodeNumber, int newNumber) {
-    if (!head) return;
-
-    Node *current = head;
-
-    while (current->next && current->value != nodeNumber) {
-        current = current->next;
-    }
-
-    if (!current) return;
-
-    Node *newNode = new Node();
-    Node *aux = current->next;
-
-    newNode->value = newNumber;
-    newNode->next = aux;
-
-    current->next = newNode;
+    aux->prev = head;
 }
 void addAfterNode(Node *node, int newNumber) {
     if (!node) return;
@@ -101,9 +89,14 @@ void addAfterNode(Node *node, int newNumber) {
     Node *aux = node->next;
 
     newNode->value = newNumber;
-    newNode->next = aux;
 
     node->next = newNode;
+    newNode->prev = node;
+
+    if(aux) {
+        newNode->next = aux;
+        aux->prev = newNode;
+    }
 }
 
 void deleteFirst(Node *&head) {
@@ -111,6 +104,8 @@ void deleteFirst(Node *&head) {
 
     Node *aux = head;
     head = head->next;
+
+    head->prev = NULL;
 
     delete aux;
     aux = NULL;
@@ -151,12 +146,11 @@ void deleteNode(Node *&head, int number) {
 
     if (current == head) {
         head = head->next;
+        if(head) head->prev = NULL;
     } else {
         beforeCurrent->next = current->next;
+        if (current->next) current->next->prev = beforeCurrent;
     }
-
-    cout << "head: " << head << endl;
-    cout << "current: " << current << endl;
 
     delete current;
     current = NULL;
@@ -175,15 +169,22 @@ Node* getNode(Node* head, int number) {
 int main() {
     Node *numbers = NULL;
 
-    addLast(numbers, 2);
+    addLast(numbers, 3);
+    addLast(numbers, 5);
+    addFirst(numbers, 2);
+    addFirst(numbers, 1);
+    addFirst(numbers, 0);
 
+    Node *node = getNode(numbers, 3);
 
-    printListValues(numbers);
+    addAfterNode(node, 4);
 
-    deleteNode(numbers, 2);
+    printList(numbers);
 
-    printListValues(numbers);
+    deleteFirst(numbers);
+
+    printList(numbers);
+
 
     return 0;
 }
-
